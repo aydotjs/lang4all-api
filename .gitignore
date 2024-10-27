@@ -1,0 +1,70 @@
+# Python compiled files
+*.pyc
+*.pyo
+__pycache__/
+
+# Environment files
+.env
+env/
+*.venv
+*.env
+env
+
+# Django migrations
+main/migrations/
+
+# IDE specific files
+*.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Database files
+*.sqlite3
+
+# Logs and reports
+*.log
+*.out
+*.err
+
+# Static and media
+/static/
+/media/
+/course_imgs
+
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+.nox/
+coverage/
+htmlcov/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
