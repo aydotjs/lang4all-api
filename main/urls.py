@@ -2,47 +2,37 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Teacher
-    path('teacher/', views.TeacherList.as_view()),
-    path('teacher/<int:pk>/', views.TeacherDetail.as_view()),
-    path('teacher-login', views.teacher_login),
-    path('teacher/dashboard/<int:pk>/', views.TeacherDashboard.as_view()),
+    # Teacher-related URLs
+    path('teacher/', views.TeacherList.as_view()),  # List all teachers
+    path('teacher/<int:pk>/', views.TeacherDetail.as_view()),  # Get details of a specific teacher
+    path('teacher-login', views.teacher_login),  # Teacher login
+    path('teacher/dashboard/<int:pk>/', views.TeacherDashboard.as_view()),  # Teacher dashboard
+    path('teacher-courses/<int:teacher_id>/', views.TeacherCourseList.as_view()),  # List courses for a specific teacher
+    path('teacher-course-detail/<int:pk>/', views.TeacherCourseDetail.as_view()),  # Get details of a specific teacher's course
 
-    # Category
-    path('category/', views.CategoryList.as_view()),
+    # Category-related URLs
+    path('category/', views.CategoryList.as_view()),  # List all categories
 
-    # Course
-    path('course/', views.CourseList.as_view()),
+    # Course-related URLs
+    path('course/', views.CourseList.as_view()),  # List all courses
+    path('course/<int:pk>/', views.CourseDetail.as_view()),  # Get details of a specific course
+    path('course-chapters/<int:course_id>/', views.CourseChapterList.as_view()),  # List chapters for a specific course
+    path('chapter/<int:pk>/', views.ChapterDetail.as_view()),  # Get details of a specific chapter
+    path('chapter/', views.ChapterList.as_view()),  # List and create chapters
 
-    # Course Detail
-    path('course/<int:pk>/', views.CourseDetail.as_view()),
+    # Student-related URLs
+    path('student/', views.StudentList.as_view()),  # List all students
+    path('student-login', views.student_login),  # Student login
+    path('student-enroll-course/', views.StudentEnrolledCourseList.as_view()),  # List enrolled courses for a student
+    path('fetch-enroll-status/<int:student_id>/<int:course_id>', views.fetch_enroll_status),  # Check enrollment status for a course
+    path('fetch-enrolled-students/<int:course_id>', views.EnrollStudentList.as_view()),  # List students enrolled in a specific course
+    path('fetch-all-enrolled-students/<int:teacher_id>', views.EnrollStudentList.as_view()),  # List all students enrolled under a specific teacher
+    path('fetch-enrolled-courses/<int:student_id>', views.EnrollStudentList.as_view()),  # List all courses a student is enrolled in
+    path('course-rating/<int:course_id>', views.CourseRatingList.as_view()),  # List ratings for a specific course
+    path('fetch-rating-status/<int:student_id>/<int:course_id>', views.fetch_rating_status),  # Check rating status for a course
+    # path('student-add-favorite-course/', views.StudentFavoriteCourseList.as_view()),  # Add a course to favorites for a student
+    # path('student-remove-favorite-course/<int:course_id>/<int:student_id>', views.remove_favorite_course),  # Remove a course from favorites for a student
 
-    # Specific Course Chapter
-    path('course-chapters/<int:course_id>/', views.CourseChapterList.as_view()),
-
-    # Specific Chapter
-    path('chapter/<int:pk>/', views.ChapterDetail.as_view()),
-
-    # Chapter List (handles listing and creating chapters)
-    path('chapter/', views.ChapterList.as_view()),
-    
-    path('student-assignment/', views.AssignmentList.as_view()),
-
-    # Teacher Courses
-    path('teacher-courses/<int:teacher_id>/', views.TeacherCourseList.as_view()),
-    #  Course Detail
-    path('teacher-course-detail/<int:pk>/', views.TeacherCourseDetail.as_view()),
-    #  Student
-    path('student/', views.StudentList.as_view()),
-    path('student-login', views.student_login),
-    path('student-enroll-course/', views.StudentEnrolledCourseList.as_view()),
-    path('fetch-enroll-status/<int:student_id>/<int:course_id>', views.fetch_enroll_status),
-    path('fetch-enrolled-students/<int:course_id>', views.EnrollStudentList.as_view()),
-    path('fetch-all-enrolled-students/<int:teacher_id>', views.EnrollStudentList.as_view()),
-    path('fetch-enrolled-courses/<int:student_id>', views.EnrollStudentList.as_view()),
-    path('course-rating/<int:course_id>', views.CourseRatingList.as_view()),
-    path('fetch-rating-status/<int:student_id>/<int:course_id>', views.fetch_rating_status),
-    path('student-add-favorite-course/', views.StudentFavoriteCourseList.as_view()),
-    path('student-remove-favorite-course/<int:course_id>/<int:student_id>', views.remove_favorite_course),
-
+    # Assignment-related URLs
+    path('student-assignment/<int:teacher_id>/<int:student_id>/', views.AssignmentList.as_view()),  # List assignments for a student assigned by a teacher
 ]

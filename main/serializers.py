@@ -1,7 +1,11 @@
 from rest_framework import serializers
 from . import models
 
+# ===========================
+# Teacher-Related Serializers
+# ===========================
 
+# Serializes Teacher information
 class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Teacher
@@ -23,13 +27,17 @@ class TeacherSerializer(serializers.ModelSerializer):
         if request and request.method == "GET":
             self.Meta.depth = 1
 
-
-class CategorySerializer(serializers.ModelSerializer):
+# Serializes teacher's dashboard statistics
+class TeacherDashboardSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.CourseCategory
-        fields = ["id", "title", "description"]
+        model = models.Teacher
+        fields = [
+            "total_teacher_courses",
+            "total_teacher_students",
+            "total_teacher_chapters",
+        ]
 
-
+# Serializes individual course details
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Course
@@ -55,23 +63,24 @@ class CourseSerializer(serializers.ModelSerializer):
         if request and request.method == "GET":
             self.Meta.depth = 1
 
-
-class TeacherDashboardSerializer(serializers.ModelSerializer):
+# Serializes Course Category information
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Teacher
-        fields = [
-            "total_teacher_courses",
-            "total_teacher_students",
-            "total_teacher_chapters",
-        ]
+        model = models.CourseCategory
+        fields = ["id", "title", "description"]
 
-
+# Serializes chapter details within a course
 class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Chapter
         fields = ["id", "course", "title", "description", "video", "remarks"]
 
 
+# ===========================
+# Student-Related Serializers
+# ===========================
+
+# Serializes Student information
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Student
@@ -84,7 +93,7 @@ class StudentSerializer(serializers.ModelSerializer):
             "interested_categories",
         ]
 
-
+# Serializes student's course enrollment details
 class StudentCourseEnrollSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.StudentCourseEnrollment
@@ -97,7 +106,7 @@ class StudentCourseEnrollSerializer(serializers.ModelSerializer):
         if request and request.method == "GET":
             self.Meta.depth = 2
 
-
+# Serializes course rating and review details
 class CourseRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CourseRating
@@ -111,35 +120,35 @@ class CourseRatingSerializer(serializers.ModelSerializer):
         if request and request.method == "GET":
             self.Meta.depth = 1
 
+# Serializes student's favorite courses
+# class StudentFavoriteCourseSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = models.StudentFavoriteCourse
+#         fields = ["id", "course", "student", "status"]
 
-class StudentFavoriteCourseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.StudentFavoriteCourse
-        fields = ["id", "course", "student", "status"]
+#     def __init__(self, *args, **kwargs):
+#         super(StudentFavoriteCourseSerializer, self).__init__(*args, **kwargs)
+#         request = self.context.get("request")
+#         self.Meta.depth = 0
+#         if request and request.method == "GET":
+#             self.Meta.depth = 2
 
-    def __init__(self, *args, **kwargs):
-        super(StudentFavoriteCourseSerializer, self).__init__(*args, **kwargs)
-        request = self.context.get("request")
-        self.Meta.depth = 0
-        if request and request.method == "GET":
-            self.Meta.depth = 2
-
-
+# Serializes student assignments
 class StudentAssignmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Course
+        model = models.StudentAssignment
         fields = [
             "id",
-            "teacher"
+            "teacher",
             "student",
-            "detail",
             "title",
+            "detail",
             "add_time",
         ]
         depth = 1
 
     def __init__(self, *args, **kwargs):
-        super(CourseSerializer, self).__init__(*args, **kwargs)
+        super(StudentAssignmentSerializer, self).__init__(*args, **kwargs)
         request = self.context.get("request")
         self.Meta.depth = 0
         if request and request.method == "GET":

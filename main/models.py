@@ -2,10 +2,11 @@ from django.db import models
 from django.core import serializers
 
 
+# ===================== Teacher Related Models =====================
+
 # Teacher Model
 class Teacher(models.Model):
     full_name = models.CharField(max_length=100)
-    # detail=models.TextField(null=True)
     email = models.CharField(max_length=100)
     password = models.CharField(max_length=100, blank=True, null=True)
     qualification = models.CharField(max_length=200)
@@ -16,17 +17,17 @@ class Teacher(models.Model):
     class Meta:
         verbose_name_plural = "1. Teachers"
 
-    # Total Teacher Courses
+    # Method to calculate total courses taught by the teacher
     def total_teacher_courses(self):
         total_courses = Course.objects.filter(teacher=self).count()
         return total_courses
 
-    # Total Teacher Chapters
+    # Method to calculate total chapters authored by the teacher
     def total_teacher_chapters(self):
         total_chapters = Chapter.objects.filter(course__teacher=self).count()
         return total_chapters
 
-    # Total Teacher Students
+    # Method to calculate total students enrolled in the teacher's courses
     def total_teacher_students(self):
         total_students = StudentCourseEnrollment.objects.filter(
             course__teacher=self
@@ -47,7 +48,6 @@ class CourseCategory(models.Model):
 
 
 # Course Model
-# Course Model
 class Course(models.Model):
     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE)
     teacher = models.ForeignKey(
@@ -61,23 +61,25 @@ class Course(models.Model):
     class Meta:
         verbose_name_plural = "3. Courses"
 
+    # Method to get related courses based on language
     def related_videos(self):
         if self.languages:
             related_videos = Course.objects.filter(languages__icontains=self.languages)
         else:
-            related_videos = Course.objects.none()  # or handle the logic in another way
-
+            related_videos = Course.objects.none()
         return serializers.serialize("json", related_videos)
 
     def __str__(self):
         return self.title
 
+    # Method to calculate total students enrolled in this course
     def total_enrolled_students(self):
         total_enrolled_students = StudentCourseEnrollment.objects.filter(
             course=self
         ).count()
         return total_enrolled_students
 
+    # Method to calculate average rating of the course
     def course_rating(self):
         course_rating = CourseRating.objects.filter(course=self).aggregate(
             avg_rating=models.Avg("rating")
@@ -98,6 +100,8 @@ class Chapter(models.Model):
     class Meta:
         verbose_name_plural = "4. Chapters"
 
+
+# ===================== Student Related Models =====================
 
 # Student Model
 class Student(models.Model):
@@ -144,16 +148,16 @@ class CourseRating(models.Model):
 
 
 # Student Favorite Course
-class StudentFavoriteCourse(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    status = models.BooleanField(default=False)
+# class StudentFavoriteCourse(models.Model):
+#     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+#     status = models.BooleanField(default=False)
 
-    class Meta:
-        verbose_name_plural = "7. Student Favorite Courses"
+#     class Meta:
+#         verbose_name_plural = "7. Student Favorite Courses"
 
-    def __str__(self):
-        return f"{self.course} - {self.student}"
+#     def __str__(self):
+#         return f"{self.course} - {self.student}"
 
 
 # Student Assignment
@@ -164,8 +168,8 @@ class StudentAssignment(models.Model):
     detail = models.TextField(null=True)
     add_time = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{title}"
-
     class Meta:
         verbose_name_plural = "9. Student Assignment"
+
+    def __str__(self):
+        return f"{self.title}"
