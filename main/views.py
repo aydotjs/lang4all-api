@@ -15,6 +15,7 @@ from .serializers import (
     CourseRatingSerializer,
     TeacherDashboardSerializer,
     StudentFavoriteCourseSerializer,
+    StudentAssignmentSerializer
 )
 from . import models
 
@@ -235,3 +236,8 @@ def remove_favorite_course(request, course_id, student_id):
         return JsonResponse({"bool": True})
     else:
         return JsonResponse({"bool": False})
+
+class AssignmentList(generics.ListCreateAPIView):
+    queryset = models.StudentAssignment.objects.all()
+    serializer_class = StudentAssignmentSerializer
+    # permission_classes = [permissions.IsAuthenticated]
