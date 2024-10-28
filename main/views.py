@@ -206,10 +206,11 @@ class CourseList(generics.ListCreateAPIView):
             qs = models.Course.objects.all().order_by("-id")[:limit]
         return qs
 
-class CourseDetail(generics.RetrieveAPIView):
-    queryset = models.Course.objects.all()
+
+class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Course.objects.all()  # Assuming you have a Course model
     serializer_class = CourseSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]  # Uncomment to enforce authentication
 
 # Chapter views
 
