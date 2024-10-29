@@ -35,4 +35,5 @@ urlpatterns = [
 
     # Assignment-related URLs
     path('student-assignment/<int:teacher_id>/<int:student_id>/', views.AssignmentList.as_view()),  # List assignments for a student assigned by a teacher
+    path('my-assignments/<int:student_id>/', views.MyAssignmentList.as_view()),  # List assignments for a student assigned by a teacher
 ]

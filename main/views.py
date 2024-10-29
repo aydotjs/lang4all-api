@@ -15,11 +15,12 @@ from .serializers import (
     CourseRatingSerializer,
     TeacherDashboardSerializer,
     # StudentFavoriteCourseSerializer,
-    StudentAssignmentSerializer
+    StudentAssignmentSerializer,
 )
 from . import models
 
 # Teacher-related views
+
 
 # Teacher list and detail views
 class TeacherList(generics.ListCreateAPIView):
@@ -27,10 +28,12 @@ class TeacherList(generics.ListCreateAPIView):
     serializer_class = TeacherSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
+
 class TeacherDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Teacher.objects.all()
     serializer_class = TeacherSerializer
     # permission_classes = [permissions.IsAuthenticated]
+
 
 # Teacher course-related views
 class TeacherCourseList(generics.ListCreateAPIView):
@@ -42,15 +45,18 @@ class TeacherCourseList(generics.ListCreateAPIView):
         teacher = models.Teacher.objects.get(pk=teacher_id)
         return models.Course.objects.filter(teacher=teacher)
 
+
 class TeacherCourseDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Course.objects.all()
     serializer_class = CourseSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
+
 # Teacher dashboard view
 class TeacherDashboard(generics.RetrieveAPIView):
     queryset = models.Teacher.objects.all()
     serializer_class = TeacherDashboardSerializer
+
 
 @csrf_exempt
 def teacher_login(request):
@@ -66,13 +72,16 @@ def teacher_login(request):
     else:
         return JsonResponse({"bool": False})
 
+
 # Student-related views
+
 
 # Student list and login views
 class StudentList(generics.ListCreateAPIView):
     queryset = models.Student.objects.all()
     serializer_class = StudentSerializer
     # permission_classes = [permissions.IsAuthenticated]
+
 
 @csrf_exempt
 def student_login(request):
@@ -88,22 +97,27 @@ def student_login(request):
     else:
         return JsonResponse({"bool": False})
 
+
 # Student course enrollment and status views
 class StudentEnrolledCourseList(generics.ListCreateAPIView):
     queryset = models.StudentCourseEnrollment.objects.all()
     serializer_class = StudentCourseEnrollSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
+
 def fetch_enroll_status(request, student_id, course_id):
     """Check enrollment status for a student in a course"""
     student = models.Student.objects.filter(id=student_id).first()
     course = models.Course.objects.filter(id=course_id).first()
-    enrollStatus = models.StudentCourseEnrollment.objects.filter(course=course, student=student).count()
+    enrollStatus = models.StudentCourseEnrollment.objects.filter(
+        course=course, student=student
+    ).count()
 
     if enrollStatus:
         return JsonResponse({"bool": True})
     else:
         return JsonResponse({"bool": False})
+
 
 class EnrollStudentList(generics.ListAPIView):
     queryset = models.StudentCourseEnrollment.objects.all()
@@ -118,11 +132,16 @@ class EnrollStudentList(generics.ListAPIView):
         elif "teacher_id" in self.kwargs:
             teacher_id = self.kwargs["teacher_id"]
             teacher = models.Teacher.objects.get(pk=teacher_id)
-            return models.StudentCourseEnrollment.objects.filter(course__teacher=teacher).distinct()
+            return models.StudentCourseEnrollment.objects.filter(
+                course__teacher=teacher
+            ).distinct()
         elif "student_id" in self.kwargs:
             student_id = self.kwargs["student_id"]
             student = models.Student.objects.get(pk=student_id)
-            return models.StudentCourseEnrollment.objects.filter(student=student).distinct()
+            return models.StudentCourseEnrollment.objects.filter(
+                student=student
+            ).distinct()
+
 
 # Student course rating and favorite views
 class CourseRatingList(generics.ListCreateAPIView):
@@ -134,16 +153,20 @@ class CourseRatingList(generics.ListCreateAPIView):
         course = models.Course.objects.get(pk=course_id)
         return models.CourseRating.objects.filter(course=course)
 
+
 def fetch_rating_status(request, student_id, course_id):
     """Check if a student has rated a course"""
     student = models.Student.objects.filter(id=student_id).first()
     course = models.Course.objects.filter(id=course_id).first()
-    ratingStatus = models.CourseRating.objects.filter(course=course, student=student).count()
+    ratingStatus = models.CourseRating.objects.filter(
+        course=course, student=student
+    ).count()
 
     if ratingStatus:
         return JsonResponse({"bool": True})
     else:
         return JsonResponse({"bool": False})
+
 
 # class StudentFavoriteCourseList(generics.ListCreateAPIView):
 #     queryset = models.StudentFavoriteCourse.objects.all()
@@ -174,6 +197,7 @@ def fetch_rating_status(request, student_id, course_id):
 #     else:
 #         return JsonResponse({"bool": False})
 
+
 # Assignment views (student and teacher specific)
 class AssignmentList(generics.ListCreateAPIView):
     queryset = models.StudentAssignment.objects.all()
@@ -181,18 +205,30 @@ class AssignmentList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Filter assignments by student and teacher"""
-        student_id = self.kwargs['student_id']
-        teacher_id = self.kwargs['teacher_id']
+        student_id = self.kwargs["student_id"]
+        teacher_id = self.kwargs["teacher_id"]
         student = models.Student.objects.get(pk=student_id)
         teacher = models.Teacher.objects.get(pk=teacher_id)
         return models.StudentAssignment.objects.filter(student=student, teacher=teacher)
 
+
+class MyAssignmentList(generics.ListCreateAPIView):
+    queryset = models.StudentAssignment.objects.all()
+    serializer_class = StudentAssignmentSerializer
+
+    def get_queryset(self):
+        student_id = self.kwargs['student_id']
+        student = models.Student.objects.get(pk=student_id)
+        return models.StudentAssignment.objects.filter(student=student)
+
 # Course-related views
+
 
 class CategoryList(generics.ListCreateAPIView):
     queryset = models.CourseCategory.objects.all()
     serializer_class = CategorySerializer
     # permission_classes = [permissions.IsAuthenticated]
+
 
 class CourseList(generics.ListCreateAPIView):
     queryset = models.Course.objects.all()
@@ -212,11 +248,14 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CourseSerializer
     # permission_classes = [permissions.IsAuthenticated]  # Uncomment to enforce authentication
 
+
 # Chapter views
+
 
 class ChapterList(generics.ListCreateAPIView):
     queryset = models.Chapter.objects.all()
     serializer_class = ChapterSerializer
+
 
 class CourseChapterList(generics.ListAPIView):
     serializer_class = ChapterSerializer
@@ -226,6 +265,7 @@ class CourseChapterList(generics.ListAPIView):
         course_id = self.kwargs["course_id"]
         course = models.Course.objects.get(pk=course_id)
         return models.Chapter.objects.filter(course=course)
+
 
 class ChapterDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Chapter.objects.all()
