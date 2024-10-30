@@ -4,6 +4,7 @@ from django.core import serializers
 
 # ===================== Teacher Related Models =====================
 
+
 # Teacher Model
 class Teacher(models.Model):
     full_name = models.CharField(max_length=100)
@@ -103,6 +104,7 @@ class Chapter(models.Model):
 
 # ===================== Student Related Models =====================
 
+
 # Student Model
 class Student(models.Model):
     full_name = models.CharField(max_length=100)
@@ -166,6 +168,7 @@ class StudentAssignment(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     detail = models.TextField(null=True)
+    student_status = models.BooleanField(default=False, null=True)
     add_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:

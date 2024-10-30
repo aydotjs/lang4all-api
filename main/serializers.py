@@ -143,6 +143,7 @@ class StudentAssignmentSerializer(serializers.ModelSerializer):
             "student",
             "title",
             "detail",
+            "student_status",
             "add_time",
         ]
         depth = 1
