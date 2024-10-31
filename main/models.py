@@ -113,6 +113,26 @@ class Student(models.Model):
     username = models.CharField(max_length=200)
     interested_categories = models.TextField()
 
+    # Total Enrolled Courses
+    def enrolled_courses(self):
+        enrolled_courses = StudentCourseEnrollment.objects.filter(student=self).count()
+        return enrolled_courses
+
+# Total Favorite Courses
+# def favorite_courses(self):
+#     favorite_courses = StudentFavoriteCourse.objects.filter(student=self).count()
+#     return favorite_courses
+
+# Completed assignments
+    def complete_assignments(self):
+        complete_assignments = StudentAssignment.objects.filter(student=self, student_status=True).count()
+        return complete_assignments
+
+# Pending assignments
+    def pending_assignments(self):
+        pending_assignments = StudentAssignment.objects.filter(student=self, student_status=False).count()
+        return pending_assignments
+
     def __str__(self):
         return self.full_name
 

@@ -197,7 +197,10 @@ def fetch_rating_status(request, student_id, course_id):
 #     else:
 #         return JsonResponse({"bool": False})
 
-
+# Student dashboard view
+class StudentDashboard(generics.RetrieveAPIView):
+    queryset = models.Student.objects.all()
+    serializer_class = StudentSerializer
 # Assignment views (student and teacher specific)
 class AssignmentList(generics.ListCreateAPIView):
     queryset = models.StudentAssignment.objects.all()
