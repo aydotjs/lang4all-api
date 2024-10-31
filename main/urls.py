@@ -32,6 +32,7 @@ urlpatterns = [
     path('fetch-rating-status/<int:student_id>/<int:course_id>', views.fetch_rating_status),  # Check rating status for a course
     # path('student-add-favorite-course/', views.StudentFavoriteCourseList.as_view()),  # Add a course to favorites for a student
     # path('student-remove-favorite-course/<int:course_id>/<int:student_id>', views.remove_favorite_course),  # Remove a course from favorites for a student
+    path('student/dashboard/<int:pk>/', views.StudentDashboard.as_view()),  # Teacher dashboard
 
     # Assignment-related URLs
     path('student-assignment/<int:teacher_id>/<int:student_id>/', views.AssignmentList.as_view()),  # List assignments for a student assigned by a teacher
