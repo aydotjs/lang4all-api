@@ -16,6 +16,7 @@ from .serializers import (
     TeacherDashboardSerializer,
     # StudentFavoriteCourseSerializer,
     StudentAssignmentSerializer,
+    StudentDashboardSerializer
 )
 from . import models
 
@@ -200,7 +201,7 @@ def fetch_rating_status(request, student_id, course_id):
 # Student dashboard view
 class StudentDashboard(generics.RetrieveAPIView):
     queryset = models.Student.objects.all()
-    serializer_class = StudentSerializer
+    serializer_class = StudentDashboardSerializer
 # Assignment views (student and teacher specific)
 class AssignmentList(generics.ListCreateAPIView):
     queryset = models.StudentAssignment.objects.all()

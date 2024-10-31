@@ -154,3 +154,10 @@ class StudentAssignmentSerializer(serializers.ModelSerializer):
         self.Meta.depth = 0
         if request and request.method == "GET":
             self.Meta.depth = 1
+
+
+# Serializes student's dashboard statistics
+class StudentDashboardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Teacher
+        fields = ['enrolled_courses',  'complete_assignments', 'pending_assignments']
