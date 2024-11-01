@@ -9,6 +9,7 @@ urlpatterns = [
     path('teacher/dashboard/<int:pk>/', views.TeacherDashboard.as_view()),  # Teacher dashboard
     path('teacher-courses/<int:teacher_id>/', views.TeacherCourseList.as_view()),  # List courses for a specific teacher
     path('teacher-course-detail/<int:pk>/', views.TeacherCourseDetail.as_view()),  # Get details of a specific teacher's course
+    path('teacher-change-password/<int:teacher_id>/', views.teacher_change_password.as_view()),  # Get details of a specific teacher's course
 
     # Category-related URLs
     path('category/', views.CategoryList.as_view()),  # List all categories
@@ -33,7 +34,7 @@ urlpatterns = [
     # path('student-add-favorite-course/', views.StudentFavoriteCourseList.as_view()),  # Add a course to favorites for a student
     # path('student-remove-favorite-course/<int:course_id>/<int:student_id>', views.remove_favorite_course),  # Remove a course from favorites for a student
     path('student/dashboard/<int:pk>/', views.StudentDashboard.as_view()),  # Teacher dashboard
-
+    path('student-change-password/<int:student_id>/', views.student_change_password.as_view()),  # Get details of a specific teacher's course
     # Assignment-related URLs
     path('student-assignment/<int:teacher_id>/<int:student_id>/', views.AssignmentList.as_view()),  # List assignments for a student assigned by a teacher
     path('my-assignments/<int:student_id>/', views.MyAssignmentList.as_view()),  # List assignments for a student assigned by a teacher

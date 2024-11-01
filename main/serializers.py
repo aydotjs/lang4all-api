@@ -159,5 +159,5 @@ class StudentAssignmentSerializer(serializers.ModelSerializer):
 # Serializes student's dashboard statistics
 class StudentDashboardSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Teacher
+        model = models.Student
         fields = ['enrolled_courses',  'complete_assignments', 'pending_assignments']
