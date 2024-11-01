@@ -16,7 +16,7 @@ from .serializers import (
     TeacherDashboardSerializer,
     # StudentFavoriteCourseSerializer,
     StudentAssignmentSerializer,
-    StudentDashboardSerializer
+    StudentDashboardSerializer,
 )
 from . import models
 
@@ -70,6 +70,20 @@ def teacher_login(request):
         teacherData = None
     if teacherData:
         return JsonResponse({"bool": True, "teacher_id": teacherData.id})
+    else:
+        return JsonResponse({"bool": False})
+
+
+@csrf_exempt
+def teacher_change_password(request, teacher_id):
+    password = request.POST["password"]
+    try:
+        teacherData = models.Teacher.objects.get(id=teacher_id)
+    except models.Teacher.DoesNotExist:
+        teacherData = None
+    if teacherData:
+        models.Teacher.objects.filter(id=teacher_id).update(password=password)
+        return JsonResponse({"bool": True})
     else:
         return JsonResponse({"bool": False})
 
@@ -198,10 +212,13 @@ def fetch_rating_status(request, student_id, course_id):
 #     else:
 #         return JsonResponse({"bool": False})
 
+
 # Student dashboard view
 class StudentDashboard(generics.RetrieveAPIView):
     queryset = models.Student.objects.all()
     serializer_class = StudentDashboardSerializer
+
+
 # Assignment views (student and teacher specific)
 class AssignmentList(generics.ListCreateAPIView):
     queryset = models.StudentAssignment.objects.all()
@@ -221,13 +238,29 @@ class MyAssignmentList(generics.ListCreateAPIView):
     serializer_class = StudentAssignmentSerializer
 
     def get_queryset(self):
-        student_id = self.kwargs['student_id']
+        student_id = self.kwargs["student_id"]
         student = models.Student.objects.get(pk=student_id)
         return models.StudentAssignment.objects.filter(student=student)
-    
+
+
 class UpdateAssignment(generics.RetrieveUpdateAPIView):
     queryset = models.StudentAssignment.objects.all()
     serializer_class = StudentAssignmentSerializer
+
+
+@csrf_exempt
+def student_change_password(request, student_id):
+    password = request.POST["password"]
+    try:
+        studentData = models.Student.objects.get(id=student_id)
+    except models.Student.DoesNotExist:
+        studentData = None
+    if studentData:
+        models.Student.objects.filter(id=student_id).update(password=password)
+        return JsonResponse({"bool": True})
+    else:
+        return JsonResponse({"bool": False})
+
 
 # Course-related views
 
