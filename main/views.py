@@ -317,7 +317,7 @@ class ChapterDetail(generics.RetrieveUpdateDestroyAPIView):
 @csrf_exempt
 def save_teacher_student_msg(request, teacher_id, student_id):
     teacher = models.Teacher.objects.get(id=teacher_id)
-    student = models.Teacher.objects.get(id=student_id)
+    student = models.Student.objects.get(id=student_id)
     msg_text = request.POST.get('msg_text')
     msg_from = request.POST.get('msg_from')
 
