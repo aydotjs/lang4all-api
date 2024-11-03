@@ -17,7 +17,7 @@ from .serializers import (
     # StudentFavoriteCourseSerializer,
     StudentAssignmentSerializer,
     StudentDashboardSerializer,
-    TeacherStudentChatSerializer
+    TeacherStudentChatSerializer,
 )
 from . import models
 
@@ -319,8 +319,8 @@ class ChapterDetail(generics.RetrieveUpdateDestroyAPIView):
 def save_teacher_student_msg(request, teacher_id, student_id):
     teacher = models.Teacher.objects.get(id=teacher_id)
     student = models.Student.objects.get(id=student_id)
-    msg_text = request.POST.get('msg_text')
-    msg_from = request.POST.get('msg_from')
+    msg_text = request.POST.get("msg_text")
+    msg_from = request.POST.get("msg_from")
 
     msgRes = models.TeacherStudentChat.objects.create(
         teacher=teacher,
@@ -330,37 +330,56 @@ def save_teacher_student_msg(request, teacher_id, student_id):
     )
 
     if msgRes:
-        return JsonResponse({'bool': True, 'msg': 'Message has been sent'})
+        return JsonResponse({"bool": True, "msg": "Message has been sent"})
     else:
-        return JsonResponse({'bool': False, 'msg': 'Oops... Some Error Occurred!!'})
+        return JsonResponse({"bool": False, "msg": "Oops... Some Error Occurred!!"})
+
 
 class MessageList(generics.ListAPIView):
     queryset = models.TeacherStudentChat.objects.all()
     serializer_class = TeacherStudentChatSerializer
 
     def get_queryset(self):
-        teacher_id = self.kwargs['teacher_id']
-        student_id = self.kwargs['student_id']
+        teacher_id = self.kwargs["teacher_id"]
+        student_id = self.kwargs["student_id"]
         teacher = models.Teacher.objects.get(pk=teacher_id)
         student = models.Student.objects.get(pk=student_id)
-        return models.TeacherStudentChat.objects.filter(teacher=teacher, student=student).exclude(msg_text="")
- 
+        return models.TeacherStudentChat.objects.filter(
+            teacher=teacher, student=student
+        ).exclude(msg_text="")
+
+
 @csrf_exempt
 def save_teacher_student_group_msg(request, teacher_id):
     teacher = models.Teacher.objects.get(id=teacher_id)
-    msg_text = request.POST.get('msg_text')
-    msg_from = request.POST.get('msg_from')
+    msg_text = request.POST.get("msg_text")
+    msg_from = request.POST.get("msg_from")
 
-    students = models.StudentCourseEnrollment.objects.filter(course__teacher=teacher).distinct()
-    for student in students:
+    enrolledList = models.StudentCourseEnrollment.objects.filter(
+        course__teacher=teacher
+    ).distinct()
+    for enrolled in enrolledList:
         msgRes = models.TeacherStudentChat.objects.create(
             teacher=teacher,
-            student=student,
+            student=enrolled.student,
             msg_text=msg_text,
             msg_from=msg_from,
         )
 
     if msgRes:
-        return JsonResponse({'bool': 'True', 'msg': 'Message has been send'})
+        return JsonResponse({"bool": "True", "msg": "Message has been send"})
     else:
-        return JsonResponse({'bool': 'False', 'msg': 'Oops... Some Error Occured!!'})
+        return JsonResponse({"bool": "False", "msg": "Oops... Some Error Occured!!"})
+
+
+class MyTeacherList(generics.ListAPIView):
+    queryset = models.StudentCourseEnrollment.objects.all()
+    serializer_class = StudentCourseEnrollSerializer
+
+    def get_queryset(self):
+        if "student_id" in self.kwargs:
+            student_id = self.kwargs["student_id"]
+            sql = "SELECT * FROM main_course as c, main_studentcourseenrollment as e, main_teacher as t WHERE c.teacher_id=t.id AND e.course_id=c.id AND e.student_id={student_id} GROUP BY c.teacher_id"
+            qs = models.Course.objects.raw(sql)
+            print(qs)
+            return qs
