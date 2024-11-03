@@ -312,3 +312,24 @@ class ChapterDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Chapter.objects.all()
     serializer_class = ChapterSerializer
     # permission_classes = [permissions.IsAuthenticated]  # Uncomment to enforce authentication
+
+
+@csrf_exempt
+def save_teacher_student_msg(request, teacher_id, student_id):
+    teacher = models.Teacher.objects.get(id=teacher_id)
+    student = models.Teacher.objects.get(id=student_id)
+    msg_text = request.POST.get('msg_text')
+    msg_from = request.POST.get('msg_from')
+
+    msgRes = models.TeacherStudentChat.objects.create(
+        teacher=teacher,
+        student=student,
+        msg_text=msg_text,
+        msg_from=msg_from,
+    )
+
+    if msgRes:
+        return JsonResponse({'bool': True, 'msg': 'Message has been sent'})
+    else:
+        return JsonResponse({'bool': False, 'msg': 'Oops... Some Error Occurred!!'})
+
