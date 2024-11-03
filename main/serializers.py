@@ -161,3 +161,8 @@ class StudentDashboardSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Student
         fields = ['enrolled_courses',  'complete_assignments', 'pending_assignments']
+
+class TeacherStudentChatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.TeacherStudentChat
+        fields = ["id", "teacher", "msg_from", "msg_text", "msg_time"]

@@ -17,6 +17,7 @@ from .serializers import (
     # StudentFavoriteCourseSerializer,
     StudentAssignmentSerializer,
     StudentDashboardSerializer,
+    TeacherStudentChatSerializer
 )
 from . import models
 
@@ -333,3 +334,13 @@ def save_teacher_student_msg(request, teacher_id, student_id):
     else:
         return JsonResponse({'bool': False, 'msg': 'Oops... Some Error Occurred!!'})
 
+class MessageList(generics.ListAPIView):
+    queryset = models.TeacherStudentChat.objects.all()
+    serializer_class = TeacherStudentChatSerializer
+
+    def get_queryset(self):
+        teacher_id = self.kwargs['teacher_id']
+        student_id = self.kwargs['student_id']
+        teacher = models.Teacher.objects.get(pk=teacher_id)
+        student = models.Student.objects.get(pk=student_id)
+        return models.TeacherStudentChat.objects.filter(teacher=teacher, student=student)
