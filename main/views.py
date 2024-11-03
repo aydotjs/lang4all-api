@@ -373,13 +373,14 @@ def save_teacher_student_group_msg(request, teacher_id):
 
 
 class MyTeacherList(generics.ListAPIView):
-    queryset = models.StudentCourseEnrollment.objects.all()
-    serializer_class = StudentCourseEnrollSerializer
+    queryset = models.Course.objects.all()
+    serializer_class = CourseSerializer
 
     def get_queryset(self):
         if "student_id" in self.kwargs:
             student_id = self.kwargs["student_id"]
-            sql = "SELECT * FROM main_course as c, main_studentcourseenrollment as e, main_teacher as t WHERE c.teacher_id=t.id AND e.course_id=c.id AND e.student_id={student_id} GROUP BY c.teacher_id"
-            qs = models.Course.objects.raw(sql)
+            sql = "SELECT * FROM main_course as c, main_studentcourseenrollment as e, main_teacher as t WHERE c.teacher_id=t.id AND e.course_id=c.id AND e.student_id=%s GROUP BY c.teacher_id"
+            qs = models.Course.objects.raw(sql, [student_id])
             print(qs)
             return qs
+
