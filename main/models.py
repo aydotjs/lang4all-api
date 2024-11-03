@@ -88,6 +88,7 @@ class Course(models.Model):
         return course_rating["avg_rating"]
 
 
+
 # Chapter Model
 class Chapter(models.Model):
     course = models.ForeignKey(
@@ -196,3 +197,14 @@ class StudentAssignment(models.Model):
 
     def __str__(self):
         return f"{self.title}"
+
+# Messages
+class TeacherStudentChat(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    msg_text = models.TextField()
+    msg_from = models.CharField(max_length=100)
+    msg_time = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "18. Teacher Student Messages"

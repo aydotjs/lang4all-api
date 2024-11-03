@@ -9,7 +9,7 @@ urlpatterns = [
     path('teacher/dashboard/<int:pk>/', views.TeacherDashboard.as_view()),  # Teacher dashboard
     path('teacher-courses/<int:teacher_id>/', views.TeacherCourseList.as_view()),  # List courses for a specific teacher
     path('teacher-course-detail/<int:pk>/', views.TeacherCourseDetail.as_view()),  # Get details of a specific teacher's course
-    path('teacher-change-password/<int:teacher_id>/', views.teacher_change_password),  # Get details of a specific teacher's course
+    path('teacher/change-password/<int:teacher_id>/', views.teacher_change_password),  # Get details of a specific teacher's course
 
     # Category-related URLs
     path('category/', views.CategoryList.as_view()),  # List all categories
