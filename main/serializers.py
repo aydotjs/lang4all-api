@@ -166,3 +166,7 @@ class TeacherStudentChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TeacherStudentChat
         fields = ["id", "teacher", "msg_from", "msg_text", "msg_time"]
+    def to_representation(self, instance):
+        representation = super(TeacherStudentChatSerializer, self).to_representation(instance)
+        representation["msg_time"] = instance.msg_time.strftime("%Y-%m-%d %H:%M")
+        return representation

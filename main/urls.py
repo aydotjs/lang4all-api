@@ -41,4 +41,5 @@ urlpatterns = [
     path('update-assignment/<int:pk>/', views.UpdateAssignment.as_view()),  # List assignments for a student assigned by a teacher
     path('send-message/<int:teacher_id>/<int:student_id>/', views.save_teacher_student_msg),  # List assignments for a student assigned by a teacher
     path('get-messages/<int:teacher_id>/<int:student_id>/', views.MessageList().as_view()),  # List assignments for a student assigned by a teacher
+     path('send-group-message/<int:teacher_id>/', views.save_teacher_student_group_msg),  # List assignments for a student assigned by a teacher
 ]

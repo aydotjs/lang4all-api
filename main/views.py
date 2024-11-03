@@ -343,4 +343,24 @@ class MessageList(generics.ListAPIView):
         student_id = self.kwargs['student_id']
         teacher = models.Teacher.objects.get(pk=teacher_id)
         student = models.Student.objects.get(pk=student_id)
-        return models.TeacherStudentChat.objects.filter(teacher=teacher, student=student)
+        return models.TeacherStudentChat.objects.filter(teacher=teacher, student=student).exclude(msg_text="")
+ 
+@csrf_exempt
+def save_teacher_student_group_msg(request, teacher_id):
+    teacher = models.Teacher.objects.get(id=teacher_id)
+    msg_text = request.POST.get('msg_text')
+    msg_from = request.POST.get('msg_from')
+
+    students = models.StudentCourseEnrollment.objects.filter(course__teacher=teacher).distinct()
+    for student in students:
+        msgRes = models.TeacherStudentChat.objects.create(
+            teacher=teacher,
+            student=student,
+            msg_text=msg_text,
+            msg_from=msg_from,
+        )
+
+    if msgRes:
+        return JsonResponse({'bool': 'True', 'msg': 'Message has been send'})
+    else:
+        return JsonResponse({'bool': 'False', 'msg': 'Oops... Some Error Occured!!'})
