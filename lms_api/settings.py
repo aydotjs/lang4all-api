@@ -71,6 +71,9 @@ DATABASES = {
         'PASSWORD': '1Million@2024',  # Add your MySQL password here
         'HOST': 'Codedynasty.mysql.pythonanywhere-services.com',
         'PORT': '3306',
+        "OPTIONS": {
+            "init_command" : "SER sql_mode="STRICT_TRANS_TABLES""
+        }
     }
 }
 
