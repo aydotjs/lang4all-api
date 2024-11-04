@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-ado4rdy1n#urywdo@pr*0isuvp!e=np@!_kt)#u51g!hpf$s=@
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['codedynasty.pythonanywhere.com']
 
 INSTALLED_APPS = [
     'corsheaders',
