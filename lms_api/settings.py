@@ -68,7 +68,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'Codedynasty$default',
         'USER': 'Codedynasty',
-        'PASSWORD': '',  # Add your MySQL password here
+        'PASSWORD': '1Million@2024',  # Add your MySQL password here
         'HOST': 'Codedynasty.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
