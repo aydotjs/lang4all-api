@@ -91,6 +91,9 @@ urlpatterns = [
         "send-group-message/<int:teacher_id>/", views.save_teacher_student_group_msg
     ),  # List assignments for a student assigned by a teacher
     path(
+        "send-group-message-from-student/<int:student_id>/", views.save_teacher_student_group_msg_from_student
+    ),  # List assignments for a student assigned by a teacher
+    path(
         "fetch-my-teachers/<int:student_id>", views.MyTeacherList.as_view()
     ),  # List all courses a student is enrolled in
 ]

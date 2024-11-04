@@ -52,14 +52,24 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'lms_api.wsgi.application'
-
+# will come back to this
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'django_lms',
+#         'USER': 'root',
+#         'PASSWORD': '',  # Add your MySQL password here
+#         'HOST': '127.0.0.1',
+#         'PORT': '3306',
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_lms',
-        'USER': 'root',
+        'NAME': 'Codedynasty$default',
+        'USER': 'Codedynasty',
         'PASSWORD': '',  # Add your MySQL password here
-        'HOST': '127.0.0.1',
+        'HOST': 'Codedynasty.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
 }

@@ -384,3 +384,26 @@ class MyTeacherList(generics.ListAPIView):
             print(qs)
             return qs
 
+@csrf_exempt
+def save_teacher_student_group_msg_from_student(request, student_id):
+    student = models.Student.objects.get(id=student_id)
+    msg_text = request.POST.get('msg_text')
+    msg_from = request.POST.get('msg_from')
+
+    sql = """SELECT * FROM main_course as c, main_studentcoursenrollment as e, main_teacher as t WHERE c.teacher_id=t.id 
+    AND e.student_id={student_id} GROUP BY c.teacher_id""".format(student_id=student.id)
+    qs = models.Course.objects.raw(sql)
+
+    myCourses = qs
+    for course in myCourses:
+        msgRes = models.TeacherStudentChat.objects.create(
+            teacher=course.teacher,
+            student=student,
+            msg_text=msg_text,
+            msg_from=msg_from,
+        )
+
+    if msgRes:
+        return JsonResponse({'bool':'True', 'msg':'Message has been send'})
+    else:
+        return JsonResponse({'bool':'False', 'msg':'Oops... Some Error Occured!!'})
