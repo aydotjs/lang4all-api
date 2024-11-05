@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-ado4rdy1n#urywdo@pr*0isuvp!e=np@!_kt)#u51g!hpf$s=@
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['codedynasty.pythonanywhere.com']
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'corsheaders',
@@ -53,26 +53,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lms_api.wsgi.application'
 # will come back to this
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'django_lms',
-#         'USER': 'root',
-#         'PASSWORD': '',  # Add your MySQL password here
-#         'HOST': '127.0.0.1',
-#         'PORT': '3306',
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Codedynasty$default',
-        'USER': 'Codedynasty',
-        'PASSWORD': 'ayobamiowoeye',  # Add your MySQL password here
-        'HOST': 'Codedynasty.mysql.pythonanywhere-services.com',
-        'PORT': '3306'
+        'NAME': 'django_lms',
+        'USER': 'root',
+        'PASSWORD': '',  # Add your MySQL password here
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'Codedynasty$default',
+#         'USER': 'Codedynasty',
+#         'PASSWORD': 'ayobamiowoeye',  # Add your MySQL password here
+#         'HOST': 'Codedynasty.mysql.pythonanywhere-services.com',
+#         'PORT': '3306'
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
