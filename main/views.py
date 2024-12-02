@@ -5,6 +5,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import permissions
+from django.conf import settings
+import stripe
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.conf import settings
+from .models import StudentCourseEnrollment
+from rest_framework import status
+from django.shortcuts  import redirect
 from .serializers import (
     TeacherSerializer,
     CategorySerializer,
@@ -20,6 +29,7 @@ from .serializers import (
     TeacherStudentChatSerializer,
 )
 from . import models
+import stripe
 
 # Teacher-related views
 
@@ -112,6 +122,43 @@ def student_login(request):
         return JsonResponse({"bool": True, "student_id": studentData.id})
     else:
         return JsonResponse({"bool": False})
+
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY  # Set your secret key here
+
+class CreatePaymentSession(APIView):
+    def post(self, request, *args, **kwargs):
+        # Retrieve course ID and student ID from the request
+        course_id = request.data.get("course_id")
+        student_id = request.data.get("student_id")
+
+        # Fetch course data (you can modify this as per your model structure)
+        course = models.Course.objects.get(id=course_id)
+        price = course.price  # Make sure you're referencing the instance, not the class.
+
+        # Create a Stripe session
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {
+                            "name": course.title,
+                            "description": course.description,
+                        },
+                        "unit_amount": int(course.price * 100),  # Convert to cents
+                    },
+                    "quantity": 1,
+                }
+            ],
+            mode="payment",
+            success_url=f"{settings.SITE_URL}/success?session_id={{CHECKOUT_SESSION_ID}}",  # Redirect on success
+            cancel_url=f"{settings.SITE_URL}/cancel",  # Redirect on cancel
+        )
+
+        return Response({"session_id": session.id}, status=status.HTTP_200_OK)
 
 
 # Student course enrollment and status views
@@ -219,7 +266,10 @@ class StudentDashboard(generics.RetrieveAPIView):
     queryset = models.Student.objects.all()
     serializer_class = StudentDashboardSerializer
 
-
+class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Student.objects.all()
+    serializer_class = StudentSerializer
+    # permission_classes = [permissions.IsAuthenticated]
 # Assignment views (student and teacher specific)
 class AssignmentList(generics.ListCreateAPIView):
     queryset = models.StudentAssignment.objects.all()
@@ -367,7 +417,7 @@ def save_teacher_student_group_msg(request, teacher_id):
         )
 
     if msgRes:
-        return JsonResponse({"bool": "True", "msg": "Message has been send"})
+        return JsonResponse({"bool": "True", "msg": "Message has been sent"})
     else:
         return JsonResponse({"bool": "False", "msg": "Oops... Some Error Occured!!"})
 
@@ -407,3 +457,32 @@ def save_teacher_student_group_msg_from_student(request, student_id):
         return JsonResponse({'bool':'True', 'msg':'Message has been send'})
     else:
         return JsonResponse({'bool':'False', 'msg':'Oops... Some Error Occured!!'})
+
+
+# stripe.api_key = settings.STRIPE_SECRET_KEY
+
+# @csrf_exempt
+# def create_checkout_session(request, course_id):
+#     stripe.api_key = settings.STRIPE_SECRET_KEY
+    
+#     # Fetch course details from your database
+#     course = models.Course.objects.get(id=course_id)  # Replace with your model logic
+#     course_price = int(course.price * 100)  # Convert price to cents
+
+#     session = stripe.checkout.Session.create(
+#         payment_method_types=["card"],
+#         line_items=[
+#             {
+#                 "price_data": {
+#                     "currency": "usd",
+#                     "product_data": {"name": course.title},
+#                     "unit_amount": course_price,
+#                 },
+#                 "quantity": 1,
+#             },
+#         ],
+#         mode="payment",
+#         success_url="http://127.0.0.1:3000/payment-success?session_id={CHECKOUT_SESSION_ID}",
+#         cancel_url="http://127.0.0.1:3000/payment-cancel",
+#     )
+#     return JsonResponse({"id": session.id})

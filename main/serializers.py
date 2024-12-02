@@ -53,6 +53,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "related_videos",
             "total_enrolled_students",
             "course_rating",
+            "price"
         ]
         depth = 1
 

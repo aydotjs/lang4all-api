@@ -58,6 +58,7 @@ class Course(models.Model):
     description = models.TextField()
     featured_img = models.ImageField(upload_to="course_imgs/", null=True)
     languages = models.TextField(null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Add this field
 
     class Meta:
         verbose_name_plural = "3. Courses"

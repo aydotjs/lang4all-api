@@ -2,7 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # -------------------------
     # Teacher-related URLs
+    # -------------------------
     path("teacher/", views.TeacherList.as_view()),  # List all teachers
     path(
         "teacher/<int:pk>/", views.TeacherDetail.as_view()
@@ -19,10 +21,14 @@ urlpatterns = [
     ),  # Get details of a specific teacher's course
     path(
         "teacher/change-password/<int:teacher_id>/", views.teacher_change_password
-    ),  # Get details of a specific teacher's course
+    ),  # Change password for a specific teacher
+    # -------------------------
     # Category-related URLs
+    # -------------------------
     path("category/", views.CategoryList.as_view()),  # List all categories
+    # -------------------------
     # Course-related URLs
+    # -------------------------
     path("course/", views.CourseList.as_view()),  # List all courses
     path(
         "course/<int:pk>/", views.CourseDetail.as_view()
@@ -34,12 +40,18 @@ urlpatterns = [
         "chapter/<int:pk>/", views.ChapterDetail.as_view()
     ),  # Get details of a specific chapter
     path("chapter/", views.ChapterList.as_view()),  # List and create chapters
+    # -------------------------
     # Student-related URLs
+    # -------------------------
     path("student/", views.StudentList.as_view()),  # List all students
     path("student-login", views.student_login),  # Student login
     path(
         "student-enroll-course/", views.StudentEnrolledCourseList.as_view()
-    ),  # List enrolled courses for a student
+    ),  # Enroll a student in a course
+      path("create-payment-session/", views.CreatePaymentSession.as_view(), name="create-payment-session"),
+    # path(
+    #     "student-pay-for-course/", views.StripeCheckoutView.as_view()
+    # ),  # Enroll a student in a course
     path(
         "fetch-enroll-status/<int:student_id>/<int:course_id>",
         views.fetch_enroll_status,
@@ -50,7 +62,7 @@ urlpatterns = [
     path(
         "fetch-all-enrolled-students/<int:teacher_id>",
         views.EnrollStudentList.as_view(),
-    ),  # List all students enrolled under a specific teacher
+    ),  # List all students under a specific teacher
     path(
         "fetch-enrolled-courses/<int:student_id>", views.EnrollStudentList.as_view()
     ),  # List all courses a student is enrolled in
@@ -61,39 +73,54 @@ urlpatterns = [
         "fetch-rating-status/<int:student_id>/<int:course_id>",
         views.fetch_rating_status,
     ),  # Check rating status for a course
-    # path('student-add-favorite-course/', views.StudentFavoriteCourseList.as_view()),  # Add a course to favorites for a student
-    # path('student-remove-favorite-course/<int:course_id>/<int:student_id>', views.remove_favorite_course),  # Remove a course from favorites for a student
+    # Optional: Add a course to favorites for a student
+    # path('student-add-favorite-course/', views.StudentFavoriteCourseList.as_view()),
+    # Optional: Remove a course from favorites for a student
+    # path('student-remove-favorite-course/<int:course_id>/<int:student_id>', views.remove_favorite_course),
     path(
         "student/dashboard/<int:pk>/", views.StudentDashboard.as_view()
-    ),  # Teacher dashboard
+    ),  # Student dashboard
     path(
         "student/change-password/<int:student_id>/", views.student_change_password
-    ),  # Get details of a specific teacher's course
+    ),  # Change password for a specific student
+    path(
+        "student/<int:pk>/", views.StudentDetail.as_view()
+    ),  # Get details of a specific teacher
+    # -------------------------
     # Assignment-related URLs
+    # -------------------------
     path(
         "student-assignment/<int:teacher_id>/<int:student_id>/",
         views.AssignmentList.as_view(),
     ),  # List assignments for a student assigned by a teacher
     path(
         "my-assignments/<int:student_id>/", views.MyAssignmentList.as_view()
-    ),  # List assignments for a student assigned by a teacher
+    ),  # List assignments for a specific student
     path(
         "update-assignment/<int:pk>/", views.UpdateAssignment.as_view()
-    ),  # List assignments for a student assigned by a teacher
+    ),  # Update assignment details
+    # -------------------------
+    # Messaging-related URLs
+    # -------------------------
     path(
         "send-message/<int:teacher_id>/<int:student_id>/",
         views.save_teacher_student_msg,
-    ),  # List assignments for a student assigned by a teacher
+    ),  # Send a message from teacher to student
     path(
         "get-messages/<int:teacher_id>/<int:student_id>/", views.MessageList().as_view()
-    ),  # List assignments for a student assigned by a teacher
+    ),  # Get all messages between a teacher and student
     path(
         "send-group-message/<int:teacher_id>/", views.save_teacher_student_group_msg
-    ),  # List assignments for a student assigned by a teacher
+    ),  # Send a group message from teacher to multiple students
     path(
-        "send-group-message-from-student/<int:student_id>/", views.save_teacher_student_group_msg_from_student
-    ),  # List assignments for a student assigned by a teacher
+        "send-group-message-from-student/<int:student_id>/",
+        views.save_teacher_student_group_msg_from_student,
+    ),  # Send a group message from student to teacher
+    # -------------------------
+    # Teacher-student relationship-related URLs
+    # -------------------------
     path(
         "fetch-my-teachers/<int:student_id>", views.MyTeacherList.as_view()
-    ),  # List all courses a student is enrolled in
+    ),  # List all teachers a student has interacted with
+    
 ]
