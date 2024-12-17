@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from . import models
+from django.core.mail import send_mail
+
 
 # ===========================
 # Teacher-Related Serializers
@@ -18,6 +20,8 @@ class TeacherSerializer(serializers.ModelSerializer):
             "mobile_no",
             "profile_img",
             "teacher_courses",
+            "otp_digit",
+            "login_via_otp",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -26,6 +30,20 @@ class TeacherSerializer(serializers.ModelSerializer):
         self.Meta.depth = 0
         if request and request.method == "GET":
             self.Meta.depth = 1
+    def create(self, validate_data):
+        email = self.validated_data['email']
+        otp_digit = self.validated_data['otp_digit']
+        instance = super(TeacherSerializer, self).create(validate_data)
+        send_mail(
+            'Verify Account',
+            'Please verify your account',
+            'codedynasty001@gmail.com',
+            [email],
+            fail_silently=False,
+         html_message=f'<p>Your OTP is </p><p>{otp_digit}</p>'
+        )
+        return instance
+
 
 # Serializes teacher's dashboard statistics
 class TeacherDashboardSerializer(serializers.ModelSerializer):
@@ -92,7 +110,30 @@ class StudentSerializer(serializers.ModelSerializer):
             "password",
             "username",
             "interested_categories",
+            "otp_digit",
+            "login_via_otp"
         ]
+    def create(self, validate_data):
+        email = self.validated_data['email']
+        otp_digit = self.validated_data['otp_digit']
+        instance = super(StudentSerializer, self).create(validate_data)
+        send_mail(
+            'Verify Account',
+           'Please verify your account',
+            'codedynasty001@gmail.com',
+            [email],
+            fail_silently=False,
+            html_message=f'<p>Your OTP is </p><p>{otp_digit}</p>'
+            )
+        return instance
+
+def __init__(self, *args, **kwargs):
+    super(StudentSerializer, self).__init__(*args, **kwargs)
+    request = self.context.get('request')
+    self.Meta.depth = 0
+    if request and request.method == 'GET':
+        self.Meta.depth = 2
+
 
 # Serializes student's course enrollment details
 class StudentCourseEnrollSerializer(serializers.ModelSerializer):

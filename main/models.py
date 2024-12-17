@@ -14,6 +14,10 @@ class Teacher(models.Model):
     mobile_no = models.CharField(max_length=20)
     profile_img = models.ImageField(upload_to="teacher_profile_imgs/", null=True)
     skills = models.TextField()
+    verify_status = models.BooleanField(default=False)
+    otp_digit = models.CharField(max_length=10, null=True)
+    login_via_otp = models.BooleanField(default=False)
+
 
     class Meta:
         verbose_name_plural = "1. Teachers"
@@ -34,6 +38,18 @@ class Teacher(models.Model):
             course__teacher=self
         ).count()
         return total_students
+    
+    # def save(self):
+    #     if self.pk is None:
+    #         send_mail(
+    #             'Verify Account',
+    #             'Please verify your account',
+    #             'codeartisnlab2607@gmail.com',
+    #             [self.email],
+    #             fail_silently=False,
+    #             html_message=f'<p>Your OTP is </p><p>{self.otp_digit}</p>'
+    #              )
+    #     return super().save()
 
 
 # Course Category
@@ -114,6 +130,10 @@ class Student(models.Model):
     password = models.CharField(max_length=100)
     username = models.CharField(max_length=200)
     interested_categories = models.TextField()
+    verify_status = models.BooleanField(default=False)
+    otp_digit = models.CharField(max_length=10, null=True)
+    login_via_otp = models.BooleanField(default=False)
+
 
     # Total Enrolled Courses
     def enrolled_courses(self):

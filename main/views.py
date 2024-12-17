@@ -13,7 +13,8 @@ from rest_framework import status
 from django.conf import settings
 from .models import StudentCourseEnrollment
 from rest_framework import status
-from django.shortcuts  import redirect
+from django.core.mail import send_mail
+from django.shortcuts import redirect
 from .serializers import (
     TeacherSerializer,
     CategorySerializer,
@@ -30,6 +31,8 @@ from .serializers import (
 )
 from . import models
 import stripe
+
+from random import randint
 
 # Teacher-related views
 
@@ -72,7 +75,6 @@ class TeacherDashboard(generics.RetrieveAPIView):
 
 @csrf_exempt
 def teacher_login(request):
-    """Handle teacher login requests"""
     email = request.POST["email"]
     password = request.POST["password"]
     try:
@@ -80,9 +82,31 @@ def teacher_login(request):
     except models.Teacher.DoesNotExist:
         teacherData = None
     if teacherData:
-        return JsonResponse({"bool": True, "teacher_id": teacherData.id})
+        if not teacherData.verify_status:
+            return JsonResponse({"bool": False, "msg": "Account is not verified!!"})
+        else:
+            if teacherData.login_via_otp:
+                # Send OTP Email
+                otp_digit = randint(100000, 999999)
+                send_mail(
+                    "Verify Account",
+                    "Please verify your account",
+                    "codedynasty001@gmail.com",
+                    [teacherData.email],
+                    fail_silently=False,
+                    html_message=f"<p>Your OTP is </p><p>{otp_digit}</p>",
+                )
+                teacherData.otp_digit = otp_digit
+                teacherData.save()
+                return JsonResponse(
+                    {"bool": True, "teacher_id": teacherData.id, "login_via_otp": True}
+                )
+            else:
+                return JsonResponse(
+                    {"bool": True, "teacher_id": teacherData.id, "login_via_otp": False}
+                )
     else:
-        return JsonResponse({"bool": False})
+        return JsonResponse({"bool": False, "msg": "Invalid Email Or Password!!!!"})
 
 
 @csrf_exempt
@@ -97,6 +121,49 @@ def teacher_change_password(request, teacher_id):
         return JsonResponse({"bool": True})
     else:
         return JsonResponse({"bool": False})
+
+
+@csrf_exempt
+def verify_teacher_via_otp(request, teacher_id):
+    otp_digit = request.POST.get("otp_digit")
+    verify = models.Teacher.objects.filter(id=teacher_id, otp_digit=otp_digit).first()
+    if verify:
+        models.Teacher.objects.filter(id=teacher_id, otp_digit=otp_digit).update(
+            verify_status=True
+        )
+        return JsonResponse({"bool": True, "teacher_id": verify.id})
+    else:
+        return JsonResponse({"bool": False, "msg": "Please enter valid 6 digit"})
+
+
+@csrf_exempt
+def teacher_forgot_password(request):
+    email = request.POST.get("email")
+    verify = models.Teacher.objects.filter(email=email).first()
+    if verify:
+        link = f"https://www.ambestenacademy.com/teacher-change-forgotten-password/{verify.id}/"
+        send_mail(
+            "Verify Account",
+            "Please verify your account",
+            "codedynasty001@gmail.com",
+            [email],
+            fail_silently=False,
+            html_message=f"<p>Click this {link} to change your password</p>",
+        )
+        return JsonResponse({"bool": True, "msg": "Please check your email"})
+    else:
+        return JsonResponse({"bool": False, "msg": "Invalid Email!!"})
+
+
+@csrf_exempt
+def teacher_change_password(request, teacher_id):
+    password = request.POST.get("password")
+    verify = models.Teacher.objects.filter(id=teacher_id).first()
+    if verify:
+        models.Teacher.objects.filter(id=teacher_id).update(password=password)
+        return JsonResponse({"bool": True, "msg": "Password has been changed"})
+    else:
+        return JsonResponse({"bool": False, "msg": "Oops... Some Error Occured!"})
 
 
 # Student-related views
@@ -124,8 +191,51 @@ def student_login(request):
         return JsonResponse({"bool": False})
 
 
+@csrf_exempt
+def verify_student_via_otp(request, student_id):
+    otp_digit = request.POST.get("otp_digit")
+    verify = models.Student.objects.filter(id=student_id, otp_digit=otp_digit).first()
+    if verify:
+        models.Student.objects.filter(id=student_id, otp_digit=otp_digit).update(
+            verify_status=True
+        )
+        return JsonResponse({"bool": True, "student_id": verify.id})
+    else:
+        return JsonResponse({"bool": False})
+    
+@csrf_exempt
+def student_forgot_password(request):
+    email = request.POST.get("email")
+    verify = models.Student.objects.filter(email=email).first()
+    if verify:
+        link = f"https://www.ambestenacademy.com/student-change-forgotten-password/{verify.id}/"
+        send_mail(
+            "Change Password",
+            "Please change your award",
+            "codedynasty001@gmail.com",
+            [email],
+            fail_silently=False,
+            html_message=f"<p>Click this {link} to change your password</p>",
+        )
+        return JsonResponse({"bool": True, "msg": "Please check your email"})
+    else:
+        return JsonResponse({"bool": False, "msg": "Invalid Email!!"})
 
+
+
+@csrf_exempt
+def student_change_forgotten_password(request, student_id):
+    password = request.POST.get("password")
+    verify = models.Student.objects.filter(id=student_id).first()
+    if verify:
+        models.Student.objects.filter(id=student_id).update(password=password)
+        return JsonResponse({"bool": True, "msg": "Password has been changed"})
+    else:
+        return JsonResponse({"bool": False, "msg": "Oops... Some Error Occured!"})
+    
+    
 stripe.api_key = settings.STRIPE_SECRET_KEY  # Set your secret key here
+
 
 class CreatePaymentSession(APIView):
     def post(self, request, *args, **kwargs):
@@ -135,7 +245,9 @@ class CreatePaymentSession(APIView):
 
         # Fetch course data (you can modify this as per your model structure)
         course = models.Course.objects.get(id=course_id)
-        price = course.price  # Make sure you're referencing the instance, not the class.
+        price = (
+            course.price
+        )  # Make sure you're referencing the instance, not the class.
 
         # Create a Stripe session
         session = stripe.checkout.Session.create(
@@ -266,10 +378,13 @@ class StudentDashboard(generics.RetrieveAPIView):
     queryset = models.Student.objects.all()
     serializer_class = StudentDashboardSerializer
 
+
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Student.objects.all()
     serializer_class = StudentSerializer
     # permission_classes = [permissions.IsAuthenticated]
+
+
 # Assignment views (student and teacher specific)
 class AssignmentList(generics.ListCreateAPIView):
     queryset = models.StudentAssignment.objects.all()
@@ -434,14 +549,17 @@ class MyTeacherList(generics.ListAPIView):
             print(qs)
             return qs
 
+
 @csrf_exempt
 def save_teacher_student_group_msg_from_student(request, student_id):
     student = models.Student.objects.get(id=student_id)
-    msg_text = request.POST.get('msg_text')
-    msg_from = request.POST.get('msg_from')
+    msg_text = request.POST.get("msg_text")
+    msg_from = request.POST.get("msg_from")
 
     sql = """SELECT * FROM main_course as c, main_studentcoursenrollment as e, main_teacher as t WHERE c.teacher_id=t.id 
-    AND e.student_id={student_id} GROUP BY c.teacher_id""".format(student_id=student.id)
+    AND e.student_id={student_id} GROUP BY c.teacher_id""".format(
+        student_id=student.id
+    )
     qs = models.Course.objects.raw(sql)
 
     myCourses = qs
@@ -454,9 +572,9 @@ def save_teacher_student_group_msg_from_student(request, student_id):
         )
 
     if msgRes:
-        return JsonResponse({'bool':'True', 'msg':'Message has been send'})
+        return JsonResponse({"bool": "True", "msg": "Message has been send"})
     else:
-        return JsonResponse({'bool':'False', 'msg':'Oops... Some Error Occured!!'})
+        return JsonResponse({"bool": "False", "msg": "Oops... Some Error Occured!!"})
 
 
 # stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -464,7 +582,7 @@ def save_teacher_student_group_msg_from_student(request, student_id):
 # @csrf_exempt
 # def create_checkout_session(request, course_id):
 #     stripe.api_key = settings.STRIPE_SECRET_KEY
-    
+
 #     # Fetch course details from your database
 #     course = models.Course.objects.get(id=course_id)  # Replace with your model logic
 #     course_price = int(course.price * 100)  # Convert price to cents

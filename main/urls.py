@@ -122,5 +122,20 @@ urlpatterns = [
     path(
         "fetch-my-teachers/<int:student_id>", views.MyTeacherList.as_view()
     ),  # List all teachers a student has interacted with
-    
+     # -------------------------
+    # Password reset-related URLs
+    # -------------------------
+    # path("password-reset/", views.PasswordResetAPIView.as_view(), name="password_reset"),
+    # path(
+    #     "password-reset-confirm/<uidb64>/<token>/",
+    #     views.PasswordResetConfirmAPIView.as_view(),
+    #     name="password_reset_confirm",
+    # ),
+    path('verify-teacher/<int:teacher_id>/', views.verify_teacher_via_otp),
+    path('verify-student/<int:student_id>/', views.verify_student_via_otp),
+    path('teacher-forgot-password/', views.teacher_forgot_password),
+    path('student-forgot-password/', views.student_forgot_password),
+    path('teacher-change-password/<int:teacher_id>/', views.teacher_change_password),
+    path('student-change-password/<int:student_id>/', views.student_change_forgotten_password),
+
 ]
